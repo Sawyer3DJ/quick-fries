@@ -52,6 +52,7 @@
 
 <script>
   let order = [];
+
   function startOrder() {
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('menuPage').style.display = 'block';
@@ -74,14 +75,24 @@
 
   function placeOrder() {
     const comments = document.getElementById('comments').value;
+
     fetch('http://192.168.116.3:5000/receive-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ order: order, comments: comments })
-    }).then(res => res.json()).then(() => {
+    })
+    .then(res => {
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+      return res.json();
+    })
+    .then(() => {
       document.getElementById('reviewPage').style.display = 'none';
       document.getElementById('confirmationPage').style.display = 'block';
-    }).catch(() => alert('Failed to send order. Please try again.'));
+    })
+    .catch(error => {
+      console.error('Error sending order:', error);
+      alert('Failed to send order. Check if your server is running and the IP is correct.\\nDetails: ' + error);
+    });
   }
 </script>
 
