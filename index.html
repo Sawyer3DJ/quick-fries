@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beefeater Quick Order</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FF6A13; /* Beefeater Orange */
+      color: white;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 30px;
+    }
+    .menu-section {
+      margin-bottom: 20px;
+    }
+    .menu-item {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .menu-item input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    .order-summary {
+      margin-top: 20px;
+      background-color: #333;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+    }
+    .button-grey {
+      background-color: #aaa;
+    }
+    .button-green {
+      background-color: #28a745;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Beefeater Table Quick Order</h1>
+  
+  <div class="menu-section">
+    <h2>Select Your Items</h2>
+    
+    <div class="menu-item">
+      <input type="checkbox" id="item1" value="Large Fries">
+      <label for="item1">Large Fries (£100.00)</label>
+    </div>
+    
+    <div class="menu-item">
+      <input type="checkbox" id="item2" value="Large Cheesy Loaded Fries">
+      <label for="item2">Large Cheesy Loaded Fries (£100.00)</label>
+    </div>
+
+    <div class="menu-item">
+      <input type="checkbox" id="item3" value="Large Korean Chicken Fries">
+      <label for="item3">Large Korean Chicken Fries (£100.00)</label>
+    </div>
+
+    <div class="menu-item">
+      <input type="checkbox" id="item4" value="Large Onion Rings">
+      <label for="item4">Large Onion Rings (£100.00)</label>
+    </div>
+    
+    <h3>Add Comments (optional)</h3>
+    <textarea id="comments" placeholder="Enter any special requests or allergies..." rows="4"></textarea>
+    
+    <div class="order-summary">
+      <h3>Your Order</h3>
+      <div id="order-list"></div>
+      <div class="total">Total: £<span id="total-price">0.00</span></div>
+    </div>
+
+    <button onclick="submitOrder()" class="button-grey">Go Back</button>
+    <button onclick="placeOrder()" class="button-green">Place Order</button>
+  </div>
+
+  <script>
+    const menuItems = {
+      "Large Fries": 100.00,
+      "Large Cheesy Loaded Fries": 100.00,
+      "Large Korean Chicken Fries": 100.00,
+      "Large Onion Rings": 100.00
+    };
+    
+    let order = [];
+    let totalPrice = 0;
+
+    // Update order list and total price when items are checked or unchecked
+    document.querySelectorAll('input[type="checkbox"]').forEach(item => {
+      item.addEventListener('change', updateOrder);
+    });
+
+    // Update order and price when items change
+    function updateOrder() {
+      order = [];
+      totalPrice = 0;
+      
+      document.querySelectorAll('input[type="checkbox"]:checked').forEach(item => {
+        const itemName = item.value;
+        order.push(itemName);
+        totalPrice += menuItems[itemName];
+      });
+      
+      // Display the current order and total price
+      document.getElementById('order-list').innerHTML = order.join('<br>');
+      document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+    }
+
+    // Function to handle the "Place Order" button
+    function placeOrder() {
+      const comments = document.getElementById('comments').value;
+      alert('Your order has been placed!\n' + 'Comments: ' + comments);
+      // Here, you'd send the order data to your backend
+    }
+
+    // Function to handle the "Go Back" button
+    function submitOrder() {
+      alert('You can go back and adjust your order.');
+    }
+  </script>
+
+</body>
+</html>
