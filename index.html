@@ -7,135 +7,172 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       background-color: #FF6A13; /* Beefeater Orange */
-      color: white;
-      padding: 20px;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 30px;
     }
-    .menu-section {
-      margin-bottom: 20px;
-    }
-    .menu-item {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-    }
-    .menu-item input[type="checkbox"] {
-      margin-right: 10px;
-    }
-    .order-summary {
-      margin-top: 20px;
-      background-color: #333;
-      padding: 15px;
-      border-radius: 8px;
+    .container {
+      width: 80%;
+      margin: auto;
+      text-align: center;
     }
     button {
-      padding: 10px;
-      margin-top: 10px;
+      padding: 15px;
+      margin-top: 20px;
       width: 100%;
+      font-size: 18px;
+      cursor: pointer;
       border: none;
-      border-radius: 5px;
     }
-    .button-grey {
-      background-color: #aaa;
+    button.green {
+      background-color: #4CAF50;
+      color: white;
     }
-    .button-green {
-      background-color: #28a745;
+    button.grey {
+      background-color: grey;
+      color: white;
     }
-    .total {
-      font-weight: bold;
-      font-size: 1.2em;
+    .menu-section {
+      margin-top: 20px;
+    }
+    .order-summary {
+      margin-top: 30px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+    .order-item {
+      margin: 5px 0;
     }
   </style>
 </head>
 <body>
+  <!-- Landing Page -->
+  <div id="landingPage" class="container">
+    <h1>Welcome to Beefeater</h1>
+    <button id="startOrderButton" class="green">Start Quick Order</button>
+  </div>
 
-  <h1>Beefeater Table Quick Order</h1>
-  
-  <div class="menu-section">
-    <h2>Select Your Items</h2>
-    
-    <div class="menu-item">
-      <input type="checkbox" id="item1" value="Large Fries">
-      <label for="item1">Large Fries (£100.00)</label>
+  <!-- Menu Page -->
+  <div id="menuPage" class="container" style="display: none;">
+    <h2>Select your items</h2>
+    <div class="menu-section">
+      <label>
+        <input type="checkbox" value="Large Fries" class="menu-item"> Large Fries (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Cheesy Loaded Fries" class="menu-item"> Cheesy Loaded Fries (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Korean Chicken Fries" class="menu-item"> Korean Chicken Fries (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Large Onion Rings" class="menu-item"> Large Onion Rings (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Water" class="menu-item"> Water (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Coca Cola" class="menu-item"> Coca Cola (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Fanta" class="menu-item"> Fanta (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Latte" class="menu-item"> Latte (£100.00)
+      </label><br>
+      <label>
+        <input type="checkbox" value="Cappuccino" class="menu-item"> Cappuccino (£100.00)
+      </label><br>
     </div>
-    
-    <div class="menu-item">
-      <input type="checkbox" id="item2" value="Large Cheesy Loaded Fries">
-      <label for="item2">Large Cheesy Loaded Fries (£100.00)</label>
-    </div>
+    <button id="submitOrderButton" class="green">Submit Order</button>
+  </div>
 
-    <div class="menu-item">
-      <input type="checkbox" id="item3" value="Large Korean Chicken Fries">
-      <label for="item3">Large Korean Chicken Fries (£100.00)</label>
+  <!-- Review Order Page -->
+  <div id="reviewPage" class="container" style="display: none;">
+    <h2>Review Your Order</h2>
+    <div id="orderSummary" class="order-summary">
+      <!-- Order summary will go here -->
     </div>
+    <button id="goBackButton" class="grey">Go Back</button>
+    <button id="placeOrderButton" class="green">Place Order</button>
+  </div>
 
-    <div class="menu-item">
-      <input type="checkbox" id="item4" value="Large Onion Rings">
-      <label for="item4">Large Onion Rings (£100.00)</label>
-    </div>
-    
-    <h3>Add Comments (optional)</h3>
-    <textarea id="comments" placeholder="Enter any special requests or allergies..." rows="4"></textarea>
-    
-    <div class="order-summary">
-      <h3>Your Order</h3>
-      <div id="order-list"></div>
-      <div class="total">Total: £<span id="total-price">0.00</span></div>
-    </div>
-
-    <button onclick="submitOrder()" class="button-grey">Go Back</button>
-    <button onclick="placeOrder()" class="button-green">Place Order</button>
+  <!-- Confirmation Page -->
+  <div id="confirmationPage" class="container" style="display: none;">
+    <h2>Order Placed!</h2>
+    <p>Your order has been placed successfully! Please have your payment ready.</p>
   </div>
 
   <script>
-    const menuItems = {
-      "Large Fries": 100.00,
-      "Large Cheesy Loaded Fries": 100.00,
-      "Large Korean Chicken Fries": 100.00,
-      "Large Onion Rings": 100.00
-    };
-    
     let order = [];
-    let totalPrice = 0;
+    
+    // Landing Page
+    document.getElementById('startOrderButton').onclick = function() {
+      document.getElementById('landingPage').style.display = 'none';
+      document.getElementById('menuPage').style.display = 'block';
+    }
 
-    // Update order list and total price when items are checked or unchecked
-    document.querySelectorAll('input[type="checkbox"]').forEach(item => {
-      item.addEventListener('change', updateOrder);
-    });
-
-    // Update order and price when items change
-    function updateOrder() {
-      order = [];
-      totalPrice = 0;
+    // Menu Page
+    document.getElementById('submitOrderButton').onclick = function() {
+      const checkedItems = Array.from(document.querySelectorAll('.menu-item:checked')).map(i => i.value);
+      order = checkedItems;
       
-      document.querySelectorAll('input[type="checkbox"]:checked').forEach(item => {
-        const itemName = item.value;
-        order.push(itemName);
-        totalPrice += menuItems[itemName];
+      // Display order summary on the Review Order page
+      let orderSummaryHtml = '<h3>Your Order:</h3>';
+      checkedItems.forEach(item => {
+        orderSummaryHtml += `<div class="order-item">${item} (£100.00)</div>`;
       });
-      
-      // Display the current order and total price
-      document.getElementById('order-list').innerHTML = order.join('<br>');
-      document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+      orderSummaryHtml += `<h3>Total: £${checkedItems.length * 100}.00</h3>`;
+      document.getElementById('orderSummary').innerHTML = orderSummaryHtml;
+
+      document.getElementById('menuPage').style.display = 'none';
+      document.getElementById('reviewPage').style.display = 'block';
     }
 
-    // Function to handle the "Place Order" button
-    function placeOrder() {
-      const comments = document.getElementById('comments').value;
-      alert('Your order has been placed!\n' + 'Comments: ' + comments);
-      // Here, you'd send the order data to your backend
+    // Review Order Page
+    document.getElementById('goBackButton').onclick = function() {
+      document.getElementById('reviewPage').style.display = 'none';
+      document.getElementById('menuPage').style.display = 'block';
     }
 
-    // Function to handle the "Go Back" button
-    function submitOrder() {
-      alert('You can go back and adjust your order.');
+    document.getElementById('placeOrderButton').onclick = function() {
+      // Send order to the Flask server using your laptop's IP address
+      const table = 'Table 1'; // Placeholder, modify as needed
+      const comments = ''; // Placeholder for additional comments
+      const orderItems = order;
+      const totalPrice = order.length * 100;
+
+      const orderData = {
+        table: table,
+        items: orderItems,
+        comments: comments,
+        totalPrice: totalPrice,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Send order to your laptop's Flask server
+      fetch('http://192.168.116.3:5000/receive-order', {  // <-- Use laptop IP address
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Order submitted:', data);
+        document.getElementById('reviewPage').style.display = 'none';
+        document.getElementById('confirmationPage').style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Error submitting order:', error);
+        alert('Failed to submit order. Please check your connection.');
+      });
     }
   </script>
-
 </body>
 </html>
