@@ -121,24 +121,30 @@
   const order = [];
 
   document.addEventListener("DOMContentLoaded", () => {
-    for (const type in menuItems) {
-      const section = document.getElementById(type);
-      menuItems[type].forEach(item => {
-        const div = document.createElement("div");
-        div.classList.add("menu-item");
-        div.innerHTML = \`
-          <label>\${item} (£\${prices[item].toFixed(2)})</label>
-          <select onchange="updateItem('\${item}', this.value)">
-            <option value="0">0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-        \`;
-        section.appendChild(div);
-      });
-    }
-  };
+    const sidesContainer = document.getElementById("sides");
+    const drinksContainer = document.getElementById("drinks");
+
+    menuItems.sides.forEach(item => {
+      sidesContainer.innerHTML += createMenuItem(item);
+    });
+
+    menuItems.drinks.forEach(item => {
+      drinksContainer.innerHTML += createMenuItem(item);
+    });
+  });
+
+  function createMenuItem(item) {
+    return `
+      <div class="menu-item">
+        <label>${item} (£${prices[item].toFixed(2)})</label>
+        <select onchange="updateItem('${item}', this.value)">
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+        </select>
+      </div>`;
+  }
 
   function startOrder() {
     document.getElementById('landingPage').style.display = 'none';
@@ -170,12 +176,12 @@
     order.forEach(item => {
       const baseName = item.name.split(" with ")[0];
       const itemTotal = (prices[baseName] || 0) * item.quantity;
-      summary += \`\${item.quantity}x \${item.name} (£\${itemTotal.toFixed(2)})<br>\`;
+      summary += `${item.quantity}x ${item.name} (£${itemTotal.toFixed(2)})<br>`;
       total += itemTotal;
     });
 
-    summary += \`<br><strong>Comments:</strong> \${comments}\`;
-    summary += \`<br><strong>Total:</strong> £\${total.toFixed(2)}\`;
+    summary += `<br><strong>Comments:</strong> ${comments}`;
+    summary += `<br><strong>Total:</strong> £${total.toFixed(2)}`;
 
     document.getElementById('orderSummary').innerHTML = summary;
     document.getElementById('menuPage').style.display = 'none';
@@ -195,7 +201,7 @@
       body: JSON.stringify({ order: order, comments: comments })
     })
     .then(res => {
-      if (!res.ok) throw new Error(\`Server responded with \${res.status}\`);
+      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
       return res.json();
     })
     .then(() => {
