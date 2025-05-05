@@ -91,9 +91,9 @@
       document.getElementById('confirmationPage').style.display = 'block';
     })
     .catch(error => {
-      console.error('Error sending order:', error);
-      alert('Failed to send order. Make sure your server is running and firewall isn’t blocking it.\nError: ' + error);
-    });
+  console.error('Order error:', error);
+  alert('Failed to send order: ' + error.message);
+});
   }
 </script>
 
