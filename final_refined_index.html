@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beefeater Quick Order</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #FF6A13, #1a1a1a) no-repeat fixed;
+      background-size: cover;
+      color: white;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #222;
+      border-radius: 10px;
+    }
+    h1, h2 {
+      color: #FF6A13;
+      font-size: 1.5em;
+    }
+    label, select, textarea, button {
+      font-size: 1.1em;
+    }
+    .order-list {
+      margin-top: 20px;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+    }
+    .order-item span {
+      font-size: 1.1em;
+    }
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .green {
+      background-color: #28a745;
+      color: white;
+    }
+    .red {
+      background-color: #dc3545;
+      color: white;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    select, textarea, input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+    #total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+      font-size: 1.2em;
+    }
+    .connection-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .connection-group label {
+      margin-right: 10px;
+    }
+    .divider {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Place Your Order</h1>
+
+  <h2>Sides</h2>
+  <div>
+    <label>Loaded Skin-on Fries</label>
+    <select onchange="selectItem('Loaded Skin-on Fries', this.value)">
+      <option value="">Select size</option>
+      <option value="Regular">Regular</option>
+      <option value="Large">Large</option>
+    </select>
+
+    <label>Loaded Nachos</label>
+    <select onchange="selectItem('Loaded Nachos', this.value)">
+      <option value="">Select size</option>
+      <option value="Regular">Regular</option>
+      <option value="Large">Large</option>
+    </select>
+  </div>
+
+  <h2>Drinks</h2>
+  <div>
+    <label>Coca Cola</label>
+    <select onchange="selectItem('Coca Cola', this.value)">
+      <option value="">Select size</option>
+      <option value="Regular">Regular</option>
+      <option value="Large">Large</option>
+    </select>
+
+    <label>Cappuccino</label>
+    <select onchange="selectItem('Cappuccino', this.value)">
+      <option value="">Select size</option>
+      <option value="Regular">Regular</option>
+      <option value="Large">Large</option>
+    </select>
+  </div>
+
+  <div class="order-list" id="orderList"></div>
+  <div id="total">Total: £0.00</div>
+
+  <div class="divider"></div>
+
+  <textarea id="comments" placeholder="Comments or table number?"></textarea>
+  <button class="green" onclick="submitOrder()">Submit Order</button>
+
+  <div class="connection-group">
+    <label for="ipInput">IP:</label>
+    <input type="text" id="ipInput" value="localhost" />
+    <button class="red" onclick="pingServer()">Test Connection</button>
+  </div>
+  <div id="pingResult" style="margin-top:10px;"></div>
+</div>
+
+<script>
+  const prices = {
+    "Loaded Skin-on Fries Regular": 2.50,
+    "Loaded Skin-on Fries Large": 3.50,
+    "Loaded Nachos Regular": 3.00,
+    "Loaded Nachos Large": 4.00,
+    "Coca Cola Regular": 1.50,
+    "Coca Cola Large": 2.00,
+    "Cappuccino Regular": 2.20,
+    "Cappuccino Large": 2.70
+  };
+
+  const order = [];
+
+  function selectItem(item, size) {
+    if (!size) return;
+    const fullItem = item + ' ' + size;
+    const existing = order.find(i => i.name === fullItem);
+    if (!existing) {
+      order.push({ name: fullItem, quantity: 1 });
+    } else {
+      existing.quantity++;
+    }
+    renderOrder();
+  }
+
+  function renderOrder() {
+    const list = document.getElementById('orderList');
+    list.innerHTML = '';
+    let total = 0;
+
+    order.forEach((item, index) => {
+      const itemTotal = prices[item.name] * item.quantity;
+      total += itemTotal;
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.innerHTML = \`
+        <span>\${item.quantity}x \${item.name} (£\${itemTotal.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(\${index})">🗑 Remove</button>
+      \`;
+      list.appendChild(div);
+    });
+
+    document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
+  }
+
+  function removeItem(index) {
+    order[index].quantity--;
+    if (order[index].quantity <= 0) {
+      order.splice(index, 1);
+    }
+    renderOrder();
+  }
+
+  function submitOrder() {
+    const ip = document.getElementById('ipInput').value || 'localhost';
+    const comments = document.getElementById('comments').value;
+
+    fetch(\`http://\${ip}:5000/receive-order\`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order, comments })
+    })
+    .then(res => res.json())
+    .then(data => alert('Order submitted!'))
+    .catch(err => alert('Failed to send order: ' + err.message));
+  }
+
+  function pingServer() {
+    const ip = document.getElementById('ipInput').value || 'localhost';
+    fetch(\`http://\${ip}:5000/test\`)
+      .then(res => res.text())
+      .then(msg => document.getElementById('pingResult').innerText = '✓ ' + msg)
+      .catch(err => document.getElementById('pingResult').innerText = '✗ Cannot reach server');
+  }
+</script>
+
+</body>
+</html>
