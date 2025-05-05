@@ -120,7 +120,7 @@
 
   const order = [];
 
-  window.onload = () => {
+  document.addEventListener("DOMContentLoaded", () => {
     for (const type in menuItems) {
       const section = document.getElementById(type);
       menuItems[type].forEach(item => {
