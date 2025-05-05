@@ -32,12 +32,12 @@
       margin-bottom: 20px;
     }
     .menu-item {
-      margin: 8px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin: 8px 0;
     }
-    select {
+    select, input[type="checkbox"] {
       margin-left: 10px;
     }
     button {
@@ -52,6 +52,15 @@
     .green { background-color: #28a745; color: white; }
     .grey { background-color: grey; color: white; }
     textarea { width: 100%; height: 60px; margin-top: 10px; }
+    #liveTotal {
+      text-align: right;
+      font-weight: bold;
+      font-size: 18px;
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -70,20 +79,21 @@
 
   <h2>Burgers</h2>
   <div class="menu-section">
-    <label>Double Stack Burger
-      <select id="burgerSide">
-        <option value="">Choose a side...</option>
-        <option value="Chips">Chips</option>
-        <option value="Fries">Fries</option>
-        <option value="Large Chips">Large Chips</option>
-        <option value="Large Fries">Large Fries</option>
-        <option value="Loaded Fries">Loaded Fries</option>
-        <option value="Large Loaded Fries">Large Loaded Fries</option>
-      </select>
-    </label>
+    <label>Double Stack Burger with Side:</label><br>
+    <select id="burgerSide">
+      <option value="">Choose a side...</option>
+      <option value="Chips">Chips</option>
+      <option value="Fries">Fries</option>
+      <option value="Large Chips">Large Chips</option>
+      <option value="Large Fries">Large Fries</option>
+      <option value="Loaded Fries">Loaded Fries</option>
+      <option value="Large Loaded Fries">Large Loaded Fries</option>
+    </select>
+    <button class="green" onclick="addBurger()">Add Burger</button>
   </div>
 
   <textarea id="comments" placeholder="Any allergies or table number?"></textarea>
+  <div id="liveTotal">Total: £0.00</div>
   <button class="green" onclick="submitOrder()">Submit Order</button>
 </div>
 
@@ -120,56 +130,73 @@
 
   const order = [];
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const sidesContainer = document.getElementById("sides");
-    const drinksContainer = document.getElementById("drinks");
-
-    menuItems.sides.forEach(item => {
-      sidesContainer.innerHTML += createMenuItem(item);
-    });
-
-    menuItems.drinks.forEach(item => {
-      drinksContainer.innerHTML += createMenuItem(item);
-    });
-  });
-
-  function createMenuItem(item) {
-    return `
-      <div class="menu-item">
-        <label>${item} (£${prices[item].toFixed(2)})</label>
-        <select onchange="updateItem('${item}', this.value)">
-          <option value="0">0</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
-      </div>`;
-  }
-
   function startOrder() {
     document.getElementById('landingPage').style.display = 'none';
     document.getElementById('menuPage').style.display = 'block';
+    loadMenuItems();
   }
 
-  function updateItem(item, quantity) {
-    const idx = order.findIndex(i => i.name === item);
-    if (quantity == 0) {
-      if (idx !== -1) order.splice(idx, 1);
-    } else {
-      if (idx === -1) {
-        order.push({ name: item, quantity: parseInt(quantity) });
-      } else {
-        order[idx].quantity = parseInt(quantity);
-      }
+  function loadMenuItems() {
+    ['sides', 'drinks'].forEach(type => {
+      const section = document.getElementById(type);
+      section.innerHTML = '';
+      menuItems[type].forEach(item => {
+        section.innerHTML += `
+          <div class="menu-item">
+            <label>
+              <input type="checkbox" onchange="toggleItem('${item}', this)"> ${item} (£${prices[item].toFixed(2)})
+            </label>
+            <select onchange="updateQuantity('${item}', this)">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+            </select>
+          </div>`;
+      });
+    });
+  }
+
+  function toggleItem(item, checkbox) {
+    const existing = order.find(i => i.name === item);
+    if (checkbox.checked && !existing) {
+      order.push({ name: item, quantity: 1 });
+    } else if (!checkbox.checked && existing) {
+      const index = order.indexOf(existing);
+      order.splice(index, 1);
     }
+    updateTotal();
+  }
+
+  function updateQuantity(item, select) {
+    const existing = order.find(i => i.name === item);
+    if (existing) {
+      existing.quantity = parseInt(select.value);
+      updateTotal();
+    }
+  }
+
+  function addBurger() {
+    const side = document.getElementById('burgerSide').value;
+    if (!side) {
+      alert("Please choose a side for the burger.");
+      return;
+    }
+    order.push({ name: "Double Stack Burger with " + side, quantity: 1 });
+    updateTotal();
+  }
+
+  function updateTotal() {
+    let total = 0;
+    order.forEach(item => {
+      const baseName = item.name.split(" with ")[0];
+      const price = prices[baseName] || 0;
+      total += price * item.quantity;
+    });
+    document.getElementById('liveTotal').textContent = 'Total: £' + total.toFixed(2);
   }
 
   function submitOrder() {
     const comments = document.getElementById('comments').value;
-    const burgerSide = document.getElementById('burgerSide').value;
-    if (burgerSide) {
-      order.push({ name: "Double Stack Burger with " + burgerSide, quantity: 1 });
-    }
 
     let summary = "";
     let total = 0;
