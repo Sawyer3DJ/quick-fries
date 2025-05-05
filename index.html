@@ -59,7 +59,7 @@
 
   // Check server status on page load
   window.onload = () => {
-    fetch('http://192.168.116.3:5000/test')
+    fetch('http://localhost:5000/test')
       .then(res => {
         if (!res.ok) throw new Error('Server not OK');
         document.getElementById('connectionStatus').innerHTML = '<p style="color:lightgreen;">Server is connected!</p>';
@@ -93,7 +93,7 @@
   function placeOrder() {
     const comments = document.getElementById('comments').value;
 
-    fetch('http://192.168.116.3:5000/receive-order', {
+    fetch('http://localhost:5000/receive-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ order: order, comments: comments })
