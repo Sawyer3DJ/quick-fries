@@ -3,242 +3,149 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Beefeater Quick Order</title>
+  <title>Test Order App</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(to bottom right, #FF6A13, #1a1a1a);
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-      background-size: cover;
+      color: white;
       margin: 0;
-      padding: 0;
-      color: #fff;
+      padding: 20px;
     }
     .container {
-      max-width: 550px;
+      max-width: 600px;
       margin: auto;
       padding: 20px;
-      background: #222;
-      border-radius: 15px;
-      margin-top: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      background-color: #222;
+      border-radius: 10px;
     }
-    h1, h2 {
-      text-align: center;
-      color: #FF6A13;
-    }
-    .menu-section {
-      margin-bottom: 20px;
-    }
-    .menu-item {
+    h2 { color: #FF6A13; }
+    .order-list { margin-top: 15px; }
+    .order-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 8px 0;
-    }
-    select, input[type="checkbox"] {
-      margin-left: 10px;
+      margin: 5px 0;
     }
     button {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 10px;
+      padding: 5px 10px;
+      margin-left: 5px;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     .green { background-color: #28a745; color: white; }
-    .grey { background-color: grey; color: white; }
-    textarea { width: 100%; height: 60px; margin-top: 10px; }
-    #liveTotal {
-      text-align: right;
-      font-weight: bold;
-      font-size: 18px;
-      background: #111;
-      padding: 10px;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
+    .red { background-color: #dc3545; color: white; }
+    #ipInput { margin-top: 10px; width: 100%; padding: 8px; }
+    #total { font-weight: bold; text-align: right; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-<div class="container" id="landingPage">
-  <h1>Welcome to Beefeater</h1>
-  <button class="green" onclick="startOrder()">Start Quick Order</button>
-</div>
-
-<div class="container" id="menuPage" style="display: none;">
-  <h2>Sides</h2>
-  <div class="menu-section" id="sides"></div>
-
-  <h2>Drinks</h2>
-  <div class="menu-section" id="drinks"></div>
-
-  <h2>Burgers</h2>
-  <div class="menu-section">
-    <label>Double Stack Burger with Side:</label><br>
-    <select id="burgerSide">
-      <option value="">Choose a side...</option>
-      <option value="Chips">Chips</option>
-      <option value="Fries">Fries</option>
-      <option value="Large Chips">Large Chips</option>
-      <option value="Large Fries">Large Fries</option>
-      <option value="Loaded Fries">Loaded Fries</option>
-      <option value="Large Loaded Fries">Large Loaded Fries</option>
+<div class="container">
+  <h2>Local Order Test</h2>
+  <div>
+    <label for="size">Select Item:</label>
+    <select id="itemSelect">
+      <option value="Loaded Skin-on Fries">Loaded Skin-on Fries</option>
+      <option value="Loaded Nachos">Loaded Nachos</option>
+      <option value="Coca Cola">Coca Cola</option>
+      <option value="Cappuccino">Cappuccino</option>
     </select>
-    <button class="green" onclick="addBurger()">Add Burger</button>
+    <select id="sizeSelect">
+      <option value="Regular">Regular</option>
+      <option value="Large">Large</option>
+    </select>
+    <button class="green" onclick="addItem()">Add</button>
   </div>
 
-  <textarea id="comments" placeholder="Any allergies or table number?"></textarea>
-  <div id="liveTotal">Total: £0.00</div>
+  <div class="order-list" id="orderList"></div>
+  <div id="total">Total: £0.00</div>
+
+  <textarea id="comments" placeholder="Comments or table number?" style="width:100%; margin-top:10px;"></textarea>
+  <input type="text" id="ipInput" placeholder="Insert receiver IP (default: localhost)" value="localhost"/>
   <button class="green" onclick="submitOrder()">Submit Order</button>
-</div>
-
-<div class="container" id="reviewPage" style="display: none;">
-  <h2>Review Your Order</h2>
-  <div id="orderSummary"></div>
-  <button class="grey" onclick="goBack()">Go Back</button>
-  <button class="green" onclick="placeOrder()">Place Order</button>
-</div>
-
-<div class="container" id="confirmationPage" style="display: none;">
-  <h2>Order Placed Successfully!</h2>
-  <p>Please have your payment ready. Thank you!</p>
+  <button class="red" onclick="pingServer()">Test Server Connection</button>
+  <div id="pingResult" style="margin-top:10px;"></div>
 </div>
 
 <script>
-  const menuItems = {
-    sides: ["Large Fries", "Cheesy Loaded Fries", "Korean Chicken Fries", "Large Onion Rings"],
-    drinks: ["Water", "Coca Cola", "Fanta", "Latte", "Cappuccino"]
-  };
-
   const prices = {
-    "Large Fries": 2.99,
-    "Cheesy Loaded Fries": 3.49,
-    "Korean Chicken Fries": 3.99,
-    "Large Onion Rings": 2.79,
-    "Water": 1.00,
-    "Coca Cola": 2.50,
-    "Fanta": 2.50,
-    "Latte": 2.90,
-    "Cappuccino": 2.90,
-    "Double Stack Burger": 7.50
+    "Loaded Skin-on Fries Regular": 2.50,
+    "Loaded Skin-on Fries Large": 3.50,
+    "Loaded Nachos Regular": 3.00,
+    "Loaded Nachos Large": 4.00,
+    "Coca Cola Regular": 1.50,
+    "Coca Cola Large": 2.00,
+    "Cappuccino Regular": 2.20,
+    "Cappuccino Large": 2.70
   };
 
   const order = [];
 
-  function startOrder() {
-    document.getElementById('landingPage').style.display = 'none';
-    document.getElementById('menuPage').style.display = 'block';
-    loadMenuItems();
+  function addItem() {
+    const item = document.getElementById('itemSelect').value;
+    const size = document.getElementById('sizeSelect').value;
+    const fullItem = item + ' ' + size;
+    const existing = order.find(i => i.name === fullItem);
+    if (!existing) {
+      order.push({ name: fullItem, quantity: 1 });
+    } else {
+      existing.quantity++;
+    }
+    renderOrder();
   }
 
-  function loadMenuItems() {
-    ['sides', 'drinks'].forEach(type => {
-      const section = document.getElementById(type);
-      section.innerHTML = '';
-      menuItems[type].forEach(item => {
-        section.innerHTML += `
-          <div class="menu-item">
-            <label>
-              <input type="checkbox" onchange="toggleItem('${item}', this)"> ${item} (£${prices[item].toFixed(2)})
-            </label>
-            <select onchange="updateQuantity('${item}', this)">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-            </select>
-          </div>`;
-      });
+  function renderOrder() {
+    const list = document.getElementById('orderList');
+    list.innerHTML = '';
+    let total = 0;
+
+    order.forEach((item, index) => {
+      const itemPrice = prices[item.name] * item.quantity;
+      total += itemPrice;
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.innerHTML = `
+        ${item.quantity}x ${item.name} (£${itemPrice.toFixed(2)})
+        <div>
+          <button class="red" onclick="removeItem(${index})">-</button>
+        </div>
+      `;
+      list.appendChild(div);
     });
+
+    document.getElementById('total').innerText = 'Total: £' + total.toFixed(2);
   }
 
-  function toggleItem(item, checkbox) {
-    const existing = order.find(i => i.name === item);
-    if (checkbox.checked && !existing) {
-      order.push({ name: item, quantity: 1 });
-    } else if (!checkbox.checked && existing) {
-      const index = order.indexOf(existing);
+  function removeItem(index) {
+    order[index].quantity--;
+    if (order[index].quantity <= 0) {
       order.splice(index, 1);
     }
-    updateTotal();
-  }
-
-  function updateQuantity(item, select) {
-    const existing = order.find(i => i.name === item);
-    if (existing) {
-      existing.quantity = parseInt(select.value);
-      updateTotal();
-    }
-  }
-
-  function addBurger() {
-    const side = document.getElementById('burgerSide').value;
-    if (!side) {
-      alert("Please choose a side for the burger.");
-      return;
-    }
-    order.push({ name: "Double Stack Burger with " + side, quantity: 1 });
-    updateTotal();
-  }
-
-  function updateTotal() {
-    let total = 0;
-    order.forEach(item => {
-      const baseName = item.name.split(" with ")[0];
-      const price = prices[baseName] || 0;
-      total += price * item.quantity;
-    });
-    document.getElementById('liveTotal').textContent = 'Total: £' + total.toFixed(2);
+    renderOrder();
   }
 
   function submitOrder() {
+    const ip = document.getElementById('ipInput').value || 'localhost';
     const comments = document.getElementById('comments').value;
 
-    let summary = "";
-    let total = 0;
-    order.forEach(item => {
-      const baseName = item.name.split(" with ")[0];
-      const itemTotal = (prices[baseName] || 0) * item.quantity;
-      summary += `${item.quantity}x ${item.name} (£${itemTotal.toFixed(2)})<br>`;
-      total += itemTotal;
-    });
-
-    summary += `<br><strong>Comments:</strong> ${comments}`;
-    summary += `<br><strong>Total:</strong> £${total.toFixed(2)}`;
-
-    document.getElementById('orderSummary').innerHTML = summary;
-    document.getElementById('menuPage').style.display = 'none';
-    document.getElementById('reviewPage').style.display = 'block';
-  }
-
-  function goBack() {
-    document.getElementById('reviewPage').style.display = 'none';
-    document.getElementById('menuPage').style.display = 'block';
-  }
-
-  function placeOrder() {
-    const comments = document.getElementById('comments').value;
-    fetch('http://localhost:5000/receive-order', {
+    fetch(`http://${ip}:5000/receive-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order: order, comments: comments })
+      body: JSON.stringify({ order, comments })
     })
-    .then(res => {
-      if (!res.ok) throw new Error(`Server responded with ${res.status}`);
-      return res.json();
-    })
-    .then(() => {
-      document.getElementById('reviewPage').style.display = 'none';
-      document.getElementById('confirmationPage').style.display = 'block';
-    })
-    .catch(error => {
-      console.error('Order error:', error);
-      alert('Failed to send order: ' + error.message);
-    });
+    .then(res => res.json())
+    .then(data => alert('Order submitted!'))
+    .catch(err => alert('Failed to send order: ' + err.message));
+  }
+
+  function pingServer() {
+    const ip = document.getElementById('ipInput').value || 'localhost';
+    fetch(`http://${ip}:5000/test`)
+      .then(res => res.text())
+      .then(msg => document.getElementById('pingResult').innerText = '✓ ' + msg)
+      .catch(err => document.getElementById('pingResult').innerText = '✗ Cannot reach server');
   }
 </script>
 
