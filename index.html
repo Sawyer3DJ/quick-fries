@@ -195,7 +195,7 @@
 
   function placeOrder() {
     const comments = document.getElementById('comments').value;
-    fetch('http://localhost:5000/receive-order', {
+    fetch('http://172.16.11.36:5000/receive-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ order: order, comments: comments })
