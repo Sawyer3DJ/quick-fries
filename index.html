@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +17,10 @@
   </style>
 </head>
 <body>
+
+<div class="container" id="connectionStatus">
+  <p>Checking server status...</p>
+</div>
 
 <div class="container" id="landingPage">
   <h1>Welcome to Beefeater</h1>
@@ -53,6 +56,19 @@
 
 <script>
   let order = [];
+
+  // Check server status on page load
+  window.onload = () => {
+    fetch('http://192.168.116.3:5000/test')
+      .then(res => {
+        if (!res.ok) throw new Error('Server not OK');
+        document.getElementById('connectionStatus').innerHTML = '<p style="color:lightgreen;">Server is connected!</p>';
+      })
+      .catch(err => {
+        console.error('Connection failed:', err);
+        document.getElementById('connectionStatus').innerHTML = '<p style="color:crimson;">Cannot reach server.</p>';
+      });
+  };
 
   function startOrder() {
     document.getElementById('landingPage').style.display = 'none';
@@ -91,9 +107,9 @@
       document.getElementById('confirmationPage').style.display = 'block';
     })
     .catch(error => {
-  console.error('Order error:', error);
-  alert('Failed to send order: ' + error.message);
-});
+      console.error('Order error:', error);
+      alert('Failed to send order: ' + error.message);
+    });
   }
 </script>
 
