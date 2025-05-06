@@ -1,1 +1,2 @@
 # quick-fries
+LOCAL MVP
