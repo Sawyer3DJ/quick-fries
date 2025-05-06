@@ -11,7 +11,7 @@
       background-size: cover;
       color: white;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
     .container {
       max-width: 600px;
@@ -26,11 +26,20 @@
     }
     h1, h2 {
       color: #FF6A13;
-      font-size: 1.5em;
     }
     label, select, textarea, button {
-      font-size: 1.1em;
+      font-size: 1.05em;
     }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .green { background-color: #28a745; color: white; }
+    .red { background-color: #dc3545; color: white; }
+    .grey { background-color: #888; color: white; }
     .order-list {
       margin-top: 20px;
     }
@@ -41,44 +50,20 @@
       margin: 5px 0;
     }
     .order-item span {
-      font-size: 1.1em;
+      font-size: 1.05em;
     }
     .remove-btn {
       background-color: #dc3545;
       color: white;
-      border: none;
       border-radius: 5px;
       padding: 5px 10px;
       cursor: pointer;
-    }
-    .green {
-      background-color: #28a745;
-      color: white;
-    }
-    .red {
-      background-color: #dc3545;
-      color: white;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    select, textarea, input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 8px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: none;
     }
     #total {
       font-weight: bold;
       text-align: right;
       margin-top: 10px;
-      font-size: 1.2em;
+      font-size: 1.1em;
     }
     .divider {
       margin-top: 30px;
@@ -91,139 +76,148 @@
 
 <div class="container active" id="welcomePage">
   <h1>Welcome to Beefeater</h1>
-  <label for="ipInput">Staff Device IP Address:</label>
-  <input type="text" id="ipInput" value="localhost" />
-  <button class="red" onclick="pingServer()">Test Connection</button>
-  <div id="pingResult" style="margin-top:10px;"></div>
   <button class="green" onclick="startOrder()">Start Quick Order</button>
+  <div style="margin-top:40px;">
+    <button class="red" onclick="pingServer()">Test Connection</button>
+    <div id="pingResult" style="margin-top:10px;"></div>
+    <p style="font-size:0.9em;">Connected to: <strong>localhost</strong></p>
+  </div>
 </div>
 
-<div class="container" id="orderPage">
-  <h1>Place Your Order</h1>
-
+<div class="container" id="menuPage">
+  <h1>Quick Order Menu</h1>
   <h2>Sides</h2>
-  <div>
-    <label>Loaded Skin-on Fries</label>
-    <select id="friesSize">
-      <option value="Regular">Regular</option>
-      <option value="Large">Large</option>
-    </select>
-    <button class="green" onclick="addItem('Loaded Skin-on Fries', 'friesSize')">Add</button>
+  <label>Loaded Fries</label>
+  <select id="loadedFriesSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Loaded Fries', 'loadedFriesSize')">➕</button>
 
-    <label>Loaded Nachos</label>
-    <select id="nachosSize">
-      <option value="Regular">Regular</option>
-      <option value="Large">Large</option>
-    </select>
-    <button class="green" onclick="addItem('Loaded Nachos', 'nachosSize')">Add</button>
-  </div>
+  <label>Large Onion Rings</label>
+  <select id="onionRingsSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Onion Rings', 'onionRingsSize')">➕</button>
+
+  <label>Double Stack Burger</label>
+  <select id="burgerSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Double Stack Burger', 'burgerSize')">➕</button>
 
   <h2>Drinks</h2>
-  <div>
-    <label>Coca Cola</label>
-    <select id="colaSize">
-      <option value="Regular">Regular</option>
-      <option value="Large">Large</option>
-    </select>
-    <button class="green" onclick="addItem('Coca Cola', 'colaSize')">Add</button>
+  <label>Coca Cola</label>
+  <select id="colaSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Coca Cola', 'colaSize')">➕</button>
 
-    <label>Cappuccino</label>
-    <select id="coffeeSize">
-      <option value="Regular">Regular</option>
-      <option value="Large">Large</option>
-    </select>
-    <button class="green" onclick="addItem('Cappuccino', 'coffeeSize')">Add</button>
-  </div>
+  <label>Cappuccino</label>
+  <select id="coffeeSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Cappuccino', 'coffeeSize')">➕</button>
 
   <div class="order-list" id="orderList"></div>
   <div id="total">Total: £0.00</div>
 
-  <div class="divider"></div>
+  <textarea id="comments" placeholder="Comments or allergies?"></textarea>
+  <button class="green" onclick="reviewOrder()">Submit Order</button>
+</div>
 
-  <textarea id="comments" placeholder="Comments or table number?"></textarea>
-  <button class="green" onclick="submitOrder()">Submit Order</button>
+<div class="container" id="reviewPage">
+  <h1>Your Order</h1>
+  <div id="reviewSummary"></div>
+  <div class="divider"></div>
+  <button class="grey" onclick="goBack()">Go Back</button>
+  <button class="green" onclick="placeOrder()">Order Now</button>
+</div>
+
+<div class="container" id="successPage">
+  <h1>Order Successful!</h1>
+  <p>Your order number is:</p>
+  <h2 id="orderNumber" style="font-size: 2em;">#0000</h2>
+  <p>Please have payment ready.</p>
+  <button class="green" onclick="startOrder()">New Quick Order</button>
 </div>
 
 <script>
-  const prices = {
-    "Loaded Skin-on Fries Regular": 2.50,
-    "Loaded Skin-on Fries Large": 3.50,
-    "Loaded Nachos Regular": 3.00,
-    "Loaded Nachos Large": 4.00,
-    "Coca Cola Regular": 1.50,
-    "Coca Cola Large": 2.00,
-    "Cappuccino Regular": 2.20,
-    "Cappuccino Large": 2.70
-  };
+const prices = {
+  "Loaded Fries Regular": 2.50, "Loaded Fries Large": 3.50,
+  "Onion Rings Regular": 2.00, "Onion Rings Large": 3.00,
+  "Double Stack Burger Regular": 5.00, "Double Stack Burger Large": 6.50,
+  "Coca Cola Regular": 1.50, "Coca Cola Large": 2.00,
+  "Cappuccino Regular": 2.20, "Cappuccino Large": 2.70
+};
 
-  const order = [];
+const order = [];
 
-  function startOrder() {
-    document.getElementById('welcomePage').classList.remove('active');
-    document.getElementById('orderPage').classList.add('active');
-  }
+function startOrder() {
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('menuPage').classList.add('active');
+}
 
-  function addItem(itemName, selectId) {
-    const size = document.getElementById(selectId).value;
-    const fullItem = itemName + ' ' + size;
-    const existing = order.find(i => i.name === fullItem);
-    if (!existing) {
-      order.push({ name: fullItem, quantity: 1 });
-    } else {
-      existing.quantity++;
-    }
-    renderOrder();
-  }
+function addItem(name, sizeId) {
+  const size = document.getElementById(sizeId).value;
+  const fullItem = name + " " + size;
+  const existing = order.find(i => i.name === fullItem);
+  if (!existing) order.push({ name: fullItem, quantity: 1 });
+  else existing.quantity++;
+  renderOrder();
+}
 
-  function renderOrder() {
-    const list = document.getElementById('orderList');
-    list.innerHTML = '';
-    let total = 0;
+function removeItem(index) {
+  order[index].quantity--;
+  if (order[index].quantity <= 0) order.splice(index, 1);
+  renderOrder();
+}
 
-    order.forEach((item, index) => {
-      const itemTotal = prices[item.name] * item.quantity;
-      total += itemTotal;
-      const div = document.createElement('div');
-      div.className = 'order-item';
-      div.innerHTML = \`
-        <span>\${item.quantity}x \${item.name} (£\${itemTotal.toFixed(2)})</span>
-        <button class="remove-btn" onclick="removeItem(\${index})">🗑 Remove</button>
-      \`;
-      list.appendChild(div);
-    });
+function renderOrder() {
+  const list = document.getElementById('orderList');
+  list.innerHTML = '';
+  let total = 0;
+  order.forEach((item, index) => {
+    const cost = prices[item.name] * item.quantity;
+    total += cost;
+    list.innerHTML += \`
+      <div class="order-item">
+        <span>\${item.quantity}x \${item.name} (£\${cost.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(\${index})">🗑</button>
+      </div>\`;
+  });
+  document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
+}
 
-    document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
-  }
+function reviewOrder() {
+  const summary = order.map(i => \`\${i.quantity}x \${i.name}\`).join('<br>');
+  const comments = document.getElementById('comments').value;
+  const total = order.reduce((sum, i) => sum + prices[i.name] * i.quantity, 0);
+  document.getElementById('reviewSummary').innerHTML = \`\${summary}<br><br><strong>Comments:</strong> \${comments}<br><br><strong>Total:</strong> £\${total.toFixed(2)}\`;
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('reviewPage').classList.add('active');
+}
 
-  function removeItem(index) {
-    order[index].quantity--;
-    if (order[index].quantity <= 0) {
-      order.splice(index, 1);
-    }
-    renderOrder();
-  }
+function goBack() {
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('menuPage').classList.add('active');
+}
 
-  function submitOrder() {
-    const ip = document.getElementById('ipInput').value || 'localhost';
-    const comments = document.getElementById('comments').value;
+function placeOrder() {
+  const comments = document.getElementById('comments').value;
+  const orderNum = Math.floor(1000 + Math.random() * 9000);
+  fetch('http://localhost:5000/receive-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order, comments, orderNum })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Server error");
+    return res.json();
+  })
+  .then(data => {
+    document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+    document.getElementById('orderNumber').textContent = '#' + orderNum;
+    document.getElementById('successPage').classList.add('active');
+  })
+  .catch(err => alert('Order failed: ' + err.message));
+}
 
-    fetch(\`http://\${ip}:5000/receive-order\`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order, comments })
-    })
-    .then(res => res.json())
-    .then(data => alert('Order submitted!'))
-    .catch(err => alert('Failed to send order: ' + err.message));
-  }
-
-  function pingServer() {
-    const ip = document.getElementById('ipInput').value || '192.168.0.208';
-    fetch(\`http://\${ip}:5000/test\`)
-      .then(res => res.text())
-      .then(msg => document.getElementById('pingResult').innerText = '✓ ' + msg)
-      .catch(err => document.getElementById('pingResult').innerText = '✗ Cannot reach server');
-  }
+function pingServer() {
+  fetch('http://localhost:5000/test')
+    .then(res => res.text())
+    .then(msg => document.getElementById('pingResult').innerText = '✓ ' + msg)
+    .catch(() => document.getElementById('pingResult').innerText = '✗ Cannot reach server');
+}
 </script>
 
 </body>
