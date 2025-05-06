@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,7 +79,6 @@
 </head>
 <body>
 
-<!-- Welcome Page -->
 <div class="container active" id="welcomePage">
   <h1>Welcome to Beefeater</h1>
   <button class="green" onclick="startOrder()">Start Quick Order</button>
@@ -91,7 +89,6 @@
   </div>
 </div>
 
-<!-- Menu Page -->
 <div class="container" id="menuPage">
   <h1>Quick Order Menu</h1>
   <h2>Sides</h2>
@@ -123,7 +120,6 @@
   <button class="green" onclick="reviewOrder()">Submit Order</button>
 </div>
 
-<!-- Review Page -->
 <div class="container" id="reviewPage">
   <h1>Your Order</h1>
   <div id="reviewSummary"></div>
@@ -132,7 +128,6 @@
   <button class="green" onclick="placeOrder()">Order Now</button>
 </div>
 
-<!-- Success Page -->
 <div class="container" id="successPage">
   <h1>Order Successful!</h1>
   <p>Your order number is:</p>
@@ -179,20 +174,21 @@ function renderOrder() {
   order.forEach((item, index) => {
     const cost = prices[item.name] * item.quantity;
     total += cost;
-    list.innerHTML += \`
+    const itemHTML = `
       <div class="order-item">
-        <span>\${item.quantity}x \${item.name} (£\${cost.toFixed(2)})</span>
-        <button class="remove-btn" onclick="removeItem(\${index})">🗑</button>
-      </div>\`;
+        <span>${item.quantity}x ${item.name} (£${cost.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(${index})">🗑</button>
+      </div>`;
+    list.insertAdjacentHTML('beforeend', itemHTML);
   });
   document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
 }
 
 function reviewOrder() {
-  const summary = order.map(i => \`\${i.quantity}x \${i.name}\`).join('<br>');
+  const summary = order.map(i => `${i.quantity}x ${i.name}`).join('<br>');
   const comments = document.getElementById('comments').value;
   const total = order.reduce((sum, i) => sum + prices[i.name] * i.quantity, 0);
-  document.getElementById('reviewSummary').innerHTML = \`\${summary}<br><br><strong>Comments:</strong> \${comments}<br><br><strong>Total:</strong> £\${total.toFixed(2)}\`;
+  document.getElementById('reviewSummary').innerHTML = `${summary}<br><br><strong>Comments:</strong> ${comments}<br><br><strong>Total:</strong> £${total.toFixed(2)}`;
   document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
   document.getElementById('reviewPage').classList.add('active');
 }
@@ -214,7 +210,7 @@ function placeOrder() {
     if (!res.ok) throw new Error("Server error");
     return res.json();
   })
-  .then(data => {
+  .then(() => {
     document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
     document.getElementById('orderNumber').textContent = '#' + orderNum;
     document.getElementById('successPage').classList.add('active');
