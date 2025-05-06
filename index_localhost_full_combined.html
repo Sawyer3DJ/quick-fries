@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beefeater Quick Order</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #FF6A13, #1a1a1a) no-repeat fixed;
+      background-size: cover;
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background-color: #222;
+      border-radius: 10px;
+      display: none;
+    }
+    .container.active {
+      display: block;
+    }
+    h1, h2 {
+      color: #FF6A13;
+    }
+    label, select, textarea, button {
+      font-size: 1.05em;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .green { background-color: #28a745; color: white; }
+    .red { background-color: #dc3545; color: white; }
+    .grey { background-color: #888; color: white; }
+    .order-list {
+      margin-top: 20px;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+    }
+    .order-item span {
+      font-size: 1.05em;
+    }
+    .remove-btn {
+      background-color: #dc3545;
+      color: white;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    #total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 10px;
+      font-size: 1.1em;
+    }
+    .divider {
+      margin-top: 30px;
+      border-top: 1px solid #444;
+      margin-bottom: 10px;
+    }
+    .footer {
+      margin-top: 50px;
+      border-top: 1px solid #555;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Welcome Page -->
+<div class="container active" id="welcomePage">
+  <h1>Welcome to Beefeater</h1>
+  <button class="green" onclick="startOrder()">Start Quick Order</button>
+  <div class="footer">
+    <button class="red" onclick="pingServer()">Test Connection</button>
+    <div id="pingResult">Not yet tested.</div>
+    <p style="font-size:0.9em;">Connected to: <strong>localhost</strong></p>
+  </div>
+</div>
+
+<!-- Menu Page -->
+<div class="container" id="menuPage">
+  <h1>Quick Order Menu</h1>
+  <h2>Sides</h2>
+  <label>Loaded Fries</label>
+  <select id="loadedFriesSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Loaded Fries', 'loadedFriesSize')">➕</button>
+
+  <label>Large Onion Rings</label>
+  <select id="onionRingsSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Onion Rings', 'onionRingsSize')">➕</button>
+
+  <label>Double Stack Burger</label>
+  <select id="burgerSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Double Stack Burger', 'burgerSize')">➕</button>
+
+  <h2>Drinks</h2>
+  <label>Coca Cola</label>
+  <select id="colaSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Coca Cola', 'colaSize')">➕</button>
+
+  <label>Cappuccino</label>
+  <select id="coffeeSize"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Cappuccino', 'coffeeSize')">➕</button>
+
+  <div class="order-list" id="orderList"></div>
+  <div id="total">Total: £0.00</div>
+
+  <textarea id="comments" placeholder="Comments or allergies?"></textarea>
+  <button class="green" onclick="reviewOrder()">Submit Order</button>
+</div>
+
+<!-- Review Page -->
+<div class="container" id="reviewPage">
+  <h1>Your Order</h1>
+  <div id="reviewSummary"></div>
+  <div class="divider"></div>
+  <button class="grey" onclick="goBack()">Go Back</button>
+  <button class="green" onclick="placeOrder()">Order Now</button>
+</div>
+
+<!-- Success Page -->
+<div class="container" id="successPage">
+  <h1>Order Successful!</h1>
+  <p>Your order number is:</p>
+  <h2 id="orderNumber" style="font-size: 2em;">#0000</h2>
+  <p>Please have payment ready.</p>
+  <button class="green" onclick="startOrder()">New Quick Order</button>
+</div>
+
+<script>
+const prices = {
+  "Loaded Fries Regular": 2.50, "Loaded Fries Large": 3.50,
+  "Onion Rings Regular": 2.00, "Onion Rings Large": 3.00,
+  "Double Stack Burger Regular": 5.00, "Double Stack Burger Large": 6.50,
+  "Coca Cola Regular": 1.50, "Coca Cola Large": 2.00,
+  "Cappuccino Regular": 2.20, "Cappuccino Large": 2.70
+};
+
+const order = [];
+
+function startOrder() {
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('menuPage').classList.add('active');
+}
+
+function addItem(name, sizeId) {
+  const size = document.getElementById(sizeId).value;
+  const fullItem = name + " " + size;
+  const existing = order.find(i => i.name === fullItem);
+  if (!existing) order.push({ name: fullItem, quantity: 1 });
+  else existing.quantity++;
+  renderOrder();
+}
+
+function removeItem(index) {
+  order[index].quantity--;
+  if (order[index].quantity <= 0) order.splice(index, 1);
+  renderOrder();
+}
+
+function renderOrder() {
+  const list = document.getElementById('orderList');
+  list.innerHTML = '';
+  let total = 0;
+  order.forEach((item, index) => {
+    const cost = prices[item.name] * item.quantity;
+    total += cost;
+    list.innerHTML += \`
+      <div class="order-item">
+        <span>\${item.quantity}x \${item.name} (£\${cost.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(\${index})">🗑</button>
+      </div>\`;
+  });
+  document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
+}
+
+function reviewOrder() {
+  const summary = order.map(i => \`\${i.quantity}x \${i.name}\`).join('<br>');
+  const comments = document.getElementById('comments').value;
+  const total = order.reduce((sum, i) => sum + prices[i.name] * i.quantity, 0);
+  document.getElementById('reviewSummary').innerHTML = \`\${summary}<br><br><strong>Comments:</strong> \${comments}<br><br><strong>Total:</strong> £\${total.toFixed(2)}\`;
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('reviewPage').classList.add('active');
+}
+
+function goBack() {
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.getElementById('menuPage').classList.add('active');
+}
+
+function placeOrder() {
+  const comments = document.getElementById('comments').value;
+  const orderNum = Math.floor(1000 + Math.random() * 9000);
+  fetch('http://localhost:5000/receive-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ order, comments, orderNum })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Server error");
+    return res.json();
+  })
+  .then(data => {
+    document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+    document.getElementById('orderNumber').textContent = '#' + orderNum;
+    document.getElementById('successPage').classList.add('active');
+  })
+  .catch(err => alert('Order failed: ' + err.message));
+}
+
+function pingServer() {
+  fetch('http://localhost:5000/test')
+    .then(res => res.text())
+    .then(msg => document.getElementById('pingResult').innerText = '✓ ' + msg)
+    .catch(() => document.getElementById('pingResult').innerText = '✗ Cannot reach server');
+}
+</script>
+
+</body>
+</html>
