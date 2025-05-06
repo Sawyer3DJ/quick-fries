@@ -13,68 +13,21 @@
       margin: 0;
       padding: 0;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      background-color: #222;
-      border-radius: 10px;
-      display: none;
-    }
-    .container.active {
-      display: block;
-    }
-    h1, h2 {
-      color: #FF6A13;
-    }
-    label, select, textarea, button {
-      font-size: 1.05em;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
+    .container { max-width: 600px; margin: auto; padding: 20px; background-color: #222; border-radius: 10px; display: none; }
+    .container.active { display: block; }
+    h1, h2 { color: #FF6A13; }
+    label, select, textarea, button { font-size: 1.05em; }
+    button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     .green { background-color: #28a745; color: white; }
     .red { background-color: #dc3545; color: white; }
     .grey { background-color: #888; color: white; }
-    .order-list {
-      margin-top: 20px;
-    }
-    .order-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0;
-    }
-    .order-item span {
-      font-size: 1.05em;
-    }
-    .remove-btn {
-      background-color: #dc3545;
-      color: white;
-      border-radius: 5px;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-    #total {
-      font-weight: bold;
-      text-align: right;
-      margin-top: 10px;
-      font-size: 1.1em;
-    }
-    .divider {
-      margin-top: 30px;
-      border-top: 1px solid #444;
-      margin-bottom: 10px;
-    }
-    .footer {
-      margin-top: 50px;
-      border-top: 1px solid #555;
-      padding-top: 20px;
-    }
+    .order-list { margin-top: 20px; }
+    .order-item { display: flex; justify-content: space-between; align-items: center; margin: 5px 0; }
+    .order-item span { font-size: 1.05em; }
+    .remove-btn { background-color: #dc3545; color: white; border-radius: 5px; padding: 5px 10px; cursor: pointer; }
+    #total { font-weight: bold; text-align: right; margin-top: 10px; font-size: 1.1em; }
+    .divider { margin-top: 30px; border-top: 1px solid #444; margin-bottom: 10px; }
+    .footer { margin-top: 50px; border-top: 1px solid #555; padding-top: 20px; }
   </style>
 </head>
 <body>
@@ -91,27 +44,36 @@
 
 <div class="container" id="menuPage">
   <h1>Quick Order Menu</h1>
+
   <h2>Sides</h2>
   <label>Loaded Fries</label>
-  <select id="loadedFriesSize"><option>Regular</option><option>Large</option></select>
-  <button class="green" onclick="addItem('Loaded Fries', 'loadedFriesSize')">➕</button>
+  <select id="loadedFries"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Loaded Fries', 'loadedFries')">➕</button>
 
-  <label>Large Onion Rings</label>
-  <select id="onionRingsSize"><option>Regular</option><option>Large</option></select>
-  <button class="green" onclick="addItem('Onion Rings', 'onionRingsSize')">➕</button>
+  <label>Onion Rings</label>
+  <select id="onionRings"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Onion Rings', 'onionRings')">➕</button>
 
-  <label>Double Stack Burger</label>
-  <select id="burgerSize"><option>Regular</option><option>Large</option></select>
-  <button class="green" onclick="addItem('Double Stack Burger', 'burgerSize')">➕</button>
+  <label>Korean Chicken Loaded Fries</label>
+  <select id="koreanFries"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Korean Chicken Loaded Fries', 'koreanFries')">➕</button>
+
+  <label>Loaded Nachos</label>
+  <select id="nachos"><option>Regular</option><option>Large</option></select>
+  <button class="green" onclick="addItem('Loaded Nachos', 'nachos')">➕</button>
 
   <h2>Drinks</h2>
-  <label>Coca Cola</label>
-  <select id="colaSize"><option>Regular</option><option>Large</option></select>
-  <button class="green" onclick="addItem('Coca Cola', 'colaSize')">➕</button>
+  <label>Beer</label>
+  <select id="beer"><option>Half Pint</option><option>Pint</option></select>
+  <button class="green" onclick="addItem('Beer', 'beer')">➕</button>
 
-  <label>Cappuccino</label>
-  <select id="coffeeSize"><option>Regular</option><option>Large</option></select>
-  <button class="green" onclick="addItem('Cappuccino', 'coffeeSize')">➕</button>
+  <label>Red Wine</label>
+  <select id="redWine"><option>Small</option><option>Large</option><option>Bottle</option></select>
+  <button class="green" onclick="addItem('Red Wine', 'redWine')">➕</button>
+
+  <label>White Wine</label>
+  <select id="whiteWine"><option>Small</option><option>Large</option><option>Bottle</option></select>
+  <button class="green" onclick="addItem('White Wine', 'whiteWine')">➕</button>
 
   <div class="order-list" id="orderList"></div>
   <div id="total">Total: £0.00</div>
@@ -138,11 +100,13 @@
 
 <script>
 const prices = {
-  "Loaded Fries Regular": 2.50, "Loaded Fries Large": 3.50,
-  "Onion Rings Regular": 2.00, "Onion Rings Large": 3.00,
-  "Double Stack Burger Regular": 5.00, "Double Stack Burger Large": 6.50,
-  "Coca Cola Regular": 1.50, "Coca Cola Large": 2.00,
-  "Cappuccino Regular": 2.20, "Cappuccino Large": 2.70
+  "Loaded Fries Regular": 3.00, "Loaded Fries Large": 4.50,
+  "Onion Rings Regular": 2.50, "Onion Rings Large": 3.50,
+  "Korean Chicken Loaded Fries Regular": 4.00, "Korean Chicken Loaded Fries Large": 5.50,
+  "Loaded Nachos Regular": 4.50, "Loaded Nachos Large": 6.00,
+  "Beer Half Pint": 2.00, "Beer Pint": 3.80,
+  "Red Wine Small": 3.50, "Red Wine Large": 5.00, "Red Wine Bottle": 12.00,
+  "White Wine Small": 3.50, "White Wine Large": 5.00, "White Wine Bottle": 12.00
 };
 
 const order = [];
@@ -174,21 +138,20 @@ function renderOrder() {
   order.forEach((item, index) => {
     const cost = prices[item.name] * item.quantity;
     total += cost;
-    const itemHTML = `
+    list.innerHTML += \`
       <div class="order-item">
-        <span>${item.quantity}x ${item.name} (£${cost.toFixed(2)})</span>
-        <button class="remove-btn" onclick="removeItem(${index})">🗑</button>
-      </div>`;
-    list.insertAdjacentHTML('beforeend', itemHTML);
+        <span>\${item.quantity}x \${item.name} (£\${cost.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(\${index})">🗑</button>
+      </div>\`;
   });
   document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
 }
 
 function reviewOrder() {
-  const summary = order.map(i => `${i.quantity}x ${i.name}`).join('<br>');
+  const summary = order.map(i => \`\${i.quantity}x \${i.name}\`).join('<br>');
   const comments = document.getElementById('comments').value;
   const total = order.reduce((sum, i) => sum + prices[i.name] * i.quantity, 0);
-  document.getElementById('reviewSummary').innerHTML = `${summary}<br><br><strong>Comments:</strong> ${comments}<br><br><strong>Total:</strong> £${total.toFixed(2)}`;
+  document.getElementById('reviewSummary').innerHTML = \`\${summary}<br><br><strong>Comments:</strong> \${comments}<br><br><strong>Total:</strong> £\${total.toFixed(2)}\`;
   document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
   document.getElementById('reviewPage').classList.add('active');
 }
@@ -210,7 +173,7 @@ function placeOrder() {
     if (!res.ok) throw new Error("Server error");
     return res.json();
   })
-  .then(() => {
+  .then(data => {
     document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
     document.getElementById('orderNumber').textContent = '#' + orderNum;
     document.getElementById('successPage').classList.add('active');
