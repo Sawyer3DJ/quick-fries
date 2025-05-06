@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Beefeater Quick Order</title>
+  <title>Quick Order</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -33,7 +33,7 @@
 <body>
 
 <div class="container active" id="welcomePage">
-  <h1>Welcome to Beefeater</h1>
+  <h1>Welcome to Quick Order</h1>
   <button class="green" onclick="startOrder()">Start Quick Order</button>
   <div class="footer">
     <button class="red" onclick="pingServer()">Test Connection</button>
@@ -138,20 +138,20 @@ function renderOrder() {
   order.forEach((item, index) => {
     const cost = prices[item.name] * item.quantity;
     total += cost;
-    list.innerHTML += \`
+    list.innerHTML += `
       <div class="order-item">
-        <span>\${item.quantity}x \${item.name} (£\${cost.toFixed(2)})</span>
-        <button class="remove-btn" onclick="removeItem(\${index})">🗑</button>
-      </div>\`;
+        <span>${item.quantity}x ${item.name} (£${cost.toFixed(2)})</span>
+        <button class="remove-btn" onclick="removeItem(${index})">🗑</button>
+      </div>`;
   });
   document.getElementById('total').textContent = 'Total: £' + total.toFixed(2);
 }
 
 function reviewOrder() {
-  const summary = order.map(i => \`\${i.quantity}x \${i.name}\`).join('<br>');
+  const summary = order.map(i => `${i.quantity}x ${i.name}`).join('<br>');
   const comments = document.getElementById('comments').value;
   const total = order.reduce((sum, i) => sum + prices[i.name] * i.quantity, 0);
-  document.getElementById('reviewSummary').innerHTML = \`\${summary}<br><br><strong>Comments:</strong> \${comments}<br><br><strong>Total:</strong> £\${total.toFixed(2)}\`;
+  document.getElementById('reviewSummary').innerHTML = `${summary}<br><br><strong>Comments:</strong> ${comments}<br><br><strong>Total:</strong> £${total.toFixed(2)}`;
   document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
   document.getElementById('reviewPage').classList.add('active');
 }
